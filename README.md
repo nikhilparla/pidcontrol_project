@@ -7,4 +7,5 @@
 5. Car now finishes the track at 10Mph with final parameter values from Twiddle output of {Kp:0.463243	Kd:3.5	Ki: 0.014}
 6. Added speed control based on steering angle measurement. The idea is to reduce the speed if there is a large steering value calculation. This will give the car some time to get back to right track.
 7. After running the car at 40Mph for some time, the parameter values came to be {Kp: 	0.4775	Kd: 	3.26572	Ki: 	0.004}. Will use this as a basis and continue with Twiddle further.
-8. Changed error calculation from +=CTE to +-2*CTE. Observed that a run cycle of 50 times for every change in param value gives better result than 25 times.
+8. Changed error calculation from +=CTE to +-2*CTE. Observed that a run cycle of 50 times for every change in param value gives better result than 25 times. Also observed that the performance is better over time, which means Twiddle is working. Still observe sharp turns though.
+9. Final - Increased the cycle count to 100. Manually configured the final param values to (0.7275, 0.005, 3.137). Commented out the Twiddle function call. Max speed set to 50MPH.

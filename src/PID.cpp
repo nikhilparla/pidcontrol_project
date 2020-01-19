@@ -37,7 +37,7 @@ void PID::Twiddle(double cte) {
 	counter++;
 	error+= 2*cte;
 	
-	if(counter > 50){
+	if(counter > 100){
 		// get the avg cte
 		error = error/counter;
 		
