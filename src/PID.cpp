@@ -25,47 +25,39 @@ void PID::Init(double Kp_, double Ki_, double Kd_) {
 void PID::Twiddle(double cte) {
 	
 	float tolerance = 0.3;
-	static double dp[] = {0.1,0.5,0.5};
+	static double dp[] = {0.5,0.5,0.01};
 	static double p[] = {Kp, Kd, Ki};
 	static int i = 0;
-	static double best_error = 10;	// some high value
+	static double best_error=100;
+	static double error=0;
 	static int next = 0, next_next = 0;
 	double sum_k;
+	static int counter = 0;
 	
-	// implement twiddle
-	for(int k=0; k<3; k++)
-		sum_k += dp[k];
-			
-	if(sum_k > tolerance){
+	counter++;
+	error+= cte;
+	
+	if(counter > 50){
+		// get the avg cte
+		error = error/counter;
 		
-		if(next == 0 && next_next == 0){
-			std::cout << "Enter if_cond 1: "  << std::endl;
-			
-			p[i] += dp[i];
-			next = 1;
-			
-			// update values before returning
-			Kp = p[0];
-			Ki = p[2];
-			Kd = p[1];
-			
-			return;
-		}
-		
-		if(next == 1 && next_next == 0){
+		//reset counter 
+		counter = 0;
+		// implement twiddle
+		for(int k=0; k<3; k++)
+			sum_k += dp[k];
+				
+		// DEBUG
+		std::cout << "Tolerance: " << sum_k <<  "	Best Error: " << best_error << std::endl;
+				
 
-			if(cte < best_error){
-			std::cout << "Enter if_cond 2: "  << std::endl;
-				best_error = cte;
-				dp[i] *=1.1;
-				next = 0;
-				i++;
-			}
-			else{
-			std::cout << "Enter if_cond 3: "  << std::endl;				
-
-				p[i] -= 2* dp[i];
-				next_next = 1;
+		if(sum_k > tolerance){
+			
+			if(next == 0 && next_next == 0){
+				std::cout << "Enter if_cond 1: "  << std::endl;
+				
+				p[i] += dp[i];
+				next = 1;
 				
 				// update values before returning
 				Kp = p[0];
@@ -74,35 +66,57 @@ void PID::Twiddle(double cte) {
 				
 				return;
 			}
-		}
-		if(next == 1 && next_next == 1){
-		
 			
-			if(cte < best_error){
-			std::cout << "Enter if_cond 4: "  << std::endl;	
-				best_error = cte;
-				dp[i] *=1.1;
-				i++;
+			if(next == 1 && next_next == 0){
+
+				if(error < best_error){
+				std::cout << "Enter if_cond 2: "  << std::endl;
+					best_error = error;
+					dp[i] *=1.1;
+					next = 0;
+					i++;
+				}
+				else{
+				std::cout << "Enter if_cond 3: "  << std::endl;				
+
+					p[i] -= 2* dp[i];
+					next_next = 1;
+					
+					// update values before returning
+					Kp = p[0];
+					Ki = p[2];
+					Kd = p[1];
+					
+					return;
+				}
 			}
-			else{
-			std::cout << "Enter if_cond 5: "  << std::endl;				
-				p[i] += dp[i];
-				dp[i] *= 0.9;
+			if(next == 1 && next_next == 1){
+				if(error < best_error){
+				std::cout << "Enter if_cond 4: "  << std::endl;	
+					best_error = error;
+					dp[i] *=1.1;
+					i++;
+				}
+				else{
+				std::cout << "Enter if_cond 5: "  << std::endl;				
+					p[i] += dp[i];
+					dp[i] *= 0.9;
+				}
+				next = 0;
+				next_next = 0;
+				i++;			
 			}
-			next = 0;
-			next_next = 0;
-			i++;			
+			
 		}
+		if(i>2) i=0;
+		// update values before returning
+		Kp = p[0];
+		Ki = p[2];
+		Kd = p[1];
+
 		
 	}
-	if(i>2) i=0;
-	// update values before returning
-	Kp = p[0];
-	Ki = p[2];
-	Kd = p[1];
-
-	// DEBUG
-	std::cout << "Tolerance: " << sum_k << std::endl;
+	
 
 }
 
