@@ -5,3 +5,5 @@
 3.  Observed that changing param values by a large number , ‘1’ in our case , is really making the steering value jump causing the car to veer off. Will reduce the change to 0.5
 4. Corrected the error calculating mechanism. Printing out the accumulated error at every place. Reducing the dp values to 0.5,0.5,0.1. Any change in Ki is drastically affecting steering angle.
 5. Car now finishes the track at 10Mph with final parameter values from Twiddle output of {Kp:0.463243	Kd:3.5	Ki: 0.014}
+6. Added speed control based on steering angle measurement. The idea is to reduce the speed if there is a large steering value calculation. This will give the car some time to get back to right track.
+7. After running the car at 40Mph for some time, the parameter values came to be {Kp: 	0.4775	Kd: 	3.26572	Ki: 	0.004}. Will use this as a basis and continue with Twiddle further.

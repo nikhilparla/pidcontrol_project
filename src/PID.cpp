@@ -25,7 +25,7 @@ void PID::Init(double Kp_, double Ki_, double Kd_) {
 void PID::Twiddle(double cte) {
 	
 	float tolerance = 0.3;
-	static double dp[] = {0.5,0.5,0.01};
+	static double dp[] = {0.25,0.5,0.01};
 	static double p[] = {Kp, Kd, Ki};
 	static int i = 0;
 	static double best_error=100;
