@@ -1,4 +1,7 @@
 #include "PID.h"
+#include <iostream>
+
+using namespace std;
 
 /**
  * TODO: Complete the PID class. You may add any additional desired functions.
@@ -19,6 +22,90 @@ void PID::Init(double Kp_, double Ki_, double Kd_) {
    Ki = Ki_;
 }
 
+void PID::Twiddle(double cte) {
+	
+	float tolerance = 0.3;
+	static double dp[] = {0.1,0.5,0.5};
+	static double p[] = {Kp, Kd, Ki};
+	static int i = 0;
+	static double best_error = 10;	// some high value
+	static int next = 0, next_next = 0;
+	double sum_k;
+	
+	// implement twiddle
+	for(int k=0; k<3; k++)
+		sum_k += dp[k];
+			
+	if(sum_k > tolerance){
+		
+		if(next == 0 && next_next == 0){
+			std::cout << "Enter if_cond 1: "  << std::endl;
+			
+			p[i] += dp[i];
+			next = 1;
+			
+			// update values before returning
+			Kp = p[0];
+			Ki = p[2];
+			Kd = p[1];
+			
+			return;
+		}
+		
+		if(next == 1 && next_next == 0){
+
+			if(cte < best_error){
+			std::cout << "Enter if_cond 2: "  << std::endl;
+				best_error = cte;
+				dp[i] *=1.1;
+				next = 0;
+				i++;
+			}
+			else{
+			std::cout << "Enter if_cond 3: "  << std::endl;				
+
+				p[i] -= 2* dp[i];
+				next_next = 1;
+				
+				// update values before returning
+				Kp = p[0];
+				Ki = p[2];
+				Kd = p[1];
+				
+				return;
+			}
+		}
+		if(next == 1 && next_next == 1){
+		
+			
+			if(cte < best_error){
+			std::cout << "Enter if_cond 4: "  << std::endl;	
+				best_error = cte;
+				dp[i] *=1.1;
+				i++;
+			}
+			else{
+			std::cout << "Enter if_cond 5: "  << std::endl;				
+				p[i] += dp[i];
+				dp[i] *= 0.9;
+			}
+			next = 0;
+			next_next = 0;
+			i++;			
+		}
+		
+	}
+	if(i>2) i=0;
+	// update values before returning
+	Kp = p[0];
+	Ki = p[2];
+	Kd = p[1];
+
+	// DEBUG
+	std::cout << "Tolerance: " << sum_k << std::endl;
+
+}
+
 void PID::UpdateError(double cte) {
   /**
    * TODO: Update PID errors based on cte.
@@ -35,6 +122,9 @@ void PID::UpdateError(double cte) {
 
 	int_CTE = int_CTE + cte;
 	prev_cte = cte;
+	
+	std::cout << "Kp: \t" << Kp << "	Kd: \t"<< Kd << "	Ki: \t" << Ki << std::endl;
+
 
 
 }
