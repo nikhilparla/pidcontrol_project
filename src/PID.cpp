@@ -25,7 +25,7 @@ void PID::Init(double Kp_, double Ki_, double Kd_) {
 void PID::Twiddle(double cte) {
 	
 	float tolerance = 0.3;
-	static double dp[] = {0.25,0.5,0.01};
+	static double dp[] = {0.25,0.5,0.001};
 	static double p[] = {Kp, Kd, Ki};
 	static int i = 0;
 	static double best_error=100;
@@ -35,7 +35,7 @@ void PID::Twiddle(double cte) {
 	static int counter = 0;
 	
 	counter++;
-	error+= cte;
+	error+= 2*cte;
 	
 	if(counter > 50){
 		// get the avg cte
@@ -63,7 +63,7 @@ void PID::Twiddle(double cte) {
 				Kp = p[0];
 				Ki = p[2];
 				Kd = p[1];
-				
+				error = 0;
 				return;
 			}
 			
@@ -72,6 +72,7 @@ void PID::Twiddle(double cte) {
 				if(error < best_error){
 				std::cout << "Enter if_cond 2: "  << std::endl;
 					best_error = error;
+					error = 0;
 					dp[i] *=1.1;
 					next = 0;
 					i++;
@@ -81,7 +82,7 @@ void PID::Twiddle(double cte) {
 
 					p[i] -= 2* dp[i];
 					next_next = 1;
-					
+					error = 0;
 					// update values before returning
 					Kp = p[0];
 					Ki = p[2];
@@ -104,7 +105,9 @@ void PID::Twiddle(double cte) {
 				}
 				next = 0;
 				next_next = 0;
-				i++;			
+				i++;
+				error = 0;
+				
 			}
 			
 		}
